@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TOEFL Practice Timer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: #fff;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .subtitle {
+            color: #888;
+            font-size: 1.1em;
+        }
+        
+        .section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .section-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+        }
+        
+        .speaking-icon {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+        }
+        
+        .writing-icon {
+            background: linear-gradient(135deg, #4ecdc4, #44bd32);
+        }
+        
+        .section-title {
+            font-size: 1.5em;
+            font-weight: 600;
+        }
+        
+        .section-time {
+            color: #888;
+            font-size: 0.9em;
+            margin-left: auto;
+        }
+        
+        .task {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .task-name {
+            font-size: 1.2em;
+            font-weight: 500;
+        }
+        
+        .task-time {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+        
+        .task-description {
+            color: #aaa;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        
+        .timer-display {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .time {
+            font-size: 3em;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            min-width: 180px;
+            text-align: center;
+        }
+        
+        .time.warning {
+            color: #ffc107;
+            animation: pulse 1s infinite;
+        }
+        
+        .time.danger {
+            color: #ff4757;
+            animation: pulse 0.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+        
+        .progress-bar {
+            flex: 1;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            min-width: 200px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00d4ff, #7b2cbf);
+            transition: width 0.3s ease;
+            border-radius: 4px;
+        }
+        
+        .progress-fill.warning {
+            background: linear-gradient(90deg, #ffc107, #ff9800);
+        }
+        
+        .progress-fill.danger {
+            background: linear-gradient(90deg, #ff4757, #ff6b6b);
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+        }
+        
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .btn-start {
+            background: linear-gradient(135deg, #4ecdc4, #44bd32);
+            color: #fff;
+        }
+        
+        .btn-start:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(78, 205, 196, 0.4);
+        }
+        
+            background: linear-gradient(135deg, #ffc107, #ff9800);
+            color: #000;
+        }
+        
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(255, 193, 7, 0.4);
+        }
+        
+        .btn-reset {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .btn-reset:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .btn-skip {
+            background: linear-gradient(135deg, #7b2cbf, #9d4edd);
+            color: #fff;
+        }
+        
+        .btn-skip:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(123, 44, 191, 0.4);
+        }
+        
+        .quick-start {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        
+        .quick-start h3 {
+            margin-bottom: 15px;
+            color: #00d4ff;
+        }
+        
+        .quick-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .quick-btn {
+            padding: 15px 30px;
+            font-size: 1.1em;
+        }
+        
+        .quick-btn.speaking {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+        }
+        
+        .quick-btn.writing {
+            background: linear-gradient(135deg, #4ecdc4, #44bd32);
+        }
+        
+        .quick-btn.full {
+            background: linear-gradient(135deg, #7b2cbf, #9d4edd);
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 10px;
+            animation: blink 1s infinite;
+        }
+        
+        .status-indicator.active {
+            background: #4ecdc4;
+        }
+        
+        .status-indicator.stopped {
+            background: #888;
+            animation: none;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+        
+        .audio-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .audio-toggle:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #666;
+            font-size: 0.9em;
+        }
+        
+        @media (max-width: 768px) {
+            .timer-display {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .time {
+                font-size: 2em;
+                min-width: auto;
+            }
+            
+            .controls {
+                justify-content: center;
+            }
+            
+            .quick-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎯 TOEFL Practice Timer</h1>
+            <p class="subtitle">Master your timing for Speaking & Writing sections</p>
+        </header>
+        
+        <button class="audio-toggle" onclick="toggleAudio()">
+            <span id="audioIcon">🔔</span>
+            <span id="audioStatus">Audio On</span>
+        </button>
+        
+        <div class="quick-start">
+            <h3>🚀 Quick Start Practice Sessions</h3>
+            <div class="quick-buttons">
+                <button class="quick-btn speaking" onclick="startSpeakingAll()">Speaking Section (8 min)</button>
+                <button class="quick-btn writing" onclick="startWritingAll()">Writing Section (~17 min)</button>
+                <button class="quick-btn full" onclick="startFullPractice()">Full Practice (~25 min)</button>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon speaking-icon">🗣️</div>
+                <h2 class="section-title">Speaking Section</h2>
+                <span class="section-time">⏱️ Max 8 minutes total</span>
+            </div>
+            
+            <div class="task">
+                <div class="task-header">
+                    <span class="task-name">
+                        <span class="status-indicator stopped" id="speak1-status"></span>
+                        1. Listen and Repeat
+                    </span>
+                    <span class="task-time">7 sentences, 3-5s each</span>
+                </div>
+                <p class="task-description">Listen to sentences and repeat exactly after short pause. Focus on pronunciation, intonation, and exact repetition word-for-word.</p>
+                <div class="timer-display">
+                    <div class="time" id="speak1-time">08:00</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="speak1-progress" style="width: 0%"></div>
+                    </div>
+                    <div class="controls">
+                        <button class="btn-start" onclick="startTimer('speak1', 480)">Start</button>
+                        <button class="btn-reset" onclick="resetTimer('speak1', 480)">Reset</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="task">
+                <div class="task-header">
+                    <span class="task-name">
+                        <span class="status-indicator stopped" id="speak2-status"></span>
+                        2. Take an Interview
+                    </span>
+                    <span class="task-time">4 questions × 45s each</span>
+                </div>
+                <p class="task-description">Answer interview questions with pre-recorded interviewer. 45 seconds per response. Show conversational skills and instant fluency.</p>
+                <div class="timer-display">
+                    <div class="time" id="speak2-time">03:00</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="speak2-progress" style="width: 0%"></div>
+                    </div>
+                    <div class="controls">
+                        <button class="btn-start" onclick="startTimer('speak2', 180)">Start</button>
+                        <button class="btn-reset" onclick="resetTimer('speak2', 180)">Reset</button>
+                        <button class="btn-skip" onclick="skipInterval('speak2', 45)">+45s</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-header">
+                <div class="section-icon writing-icon">✍️</div>
+                <h2 class="section-title">Writing Section</h2>
+                <span class="section-time">⏱️ ~17 minutes total</span>
+            </div>
+            
+            <div class="task">
+                <div class="task-header">
+                    <span class="task-name">
+                        <span class="status-indicator stopped" id="write1-status"></span>
+                        1. Build a Sentence
+                    </span>
+                    <span class="task-time">10 sentences</span>
+                </div>
+                <p class="task-description">Rearrange words to form correct sentences. Test your understanding of sentence structure, grammar, and word order.</p>
+                <div class="timer-display">
+                    <div class="time" id="write1-time">05:00</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="write1-progress" style="width: 0%"></div>
+                    </div>
+                    <div class="controls">
+                        <button class="btn-start" onclick="startTimer('write1', 300)">Start</button>
+                        <button class="btn-reset" onclick="resetTimer('write1', 300)">Reset</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="task">
+                <div class="task-header">
+                    <span class="task-name">
+                        <span class="status-indicator stopped" id="write2-status"></span>
+                        2. Write an Email
+                    </span>
+                    <span class="task-time">7 minutes</span>
+                </div>
+                <p class="task-description">Write an email based on given purpose and 3 bullet points. Choose appropriate style (informal, semi-formal, formal).</p>
+                <div class="timer-display">
+                    <div class="time" id="write2-time">07:00</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="write2-progress" style="width: 0%"></div>
+                    </div>
+                    <div class="controls">
+                        <button class="btn-start" onclick="startTimer('write2', 420)">Start</button>
+                        <button class="btn-reset" onclick="resetTimer('write2', 420)">Reset</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="task">
+                <div class="task-header">
+                    <span class="task-name">
+                        <span class="status-indicator stopped" id="write3-status"></span>
+                        3. Write for Academic Discussion
+                    </span>
+                    <span class="task-time">10 minutes</span>
+                </div>
+                <p class="task-description">Respond to professor's question in online discussion. Write 100+ words opinion with details and examples.</p>
+                <div class="timer-display">
+                    <div class="time" id="write3-time">10:00</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="write3-progress" style="width: 0%"></div>
+                    </div>
+                    <div class="controls">
+                        <button class="btn-start" onclick="startTimer('write3', 600)">Start</button>
+                        <button class="btn-reset" onclick="resetTimer('write3', 600)">Reset</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>🎯 Practice makes perfect! Use this timer to simulate real test conditions.</p>
+            <p>💡 Tip: Try to finish each task 5-10 seconds before the time is up.</p>
+        </footer>
+    </div>
+    
+    <script>
+        let audioContext = null;
+        let audioEnabled = true;
+
+        // Store each timer's total duration so skipInterval can reference it correctly
+        const timerDurations = {
+            'speak1': 480,
+            'speak2': 180,
+            'write1': 300,
+            'write2': 420,
+            'write3': 600
+        };
+        
+        function initAudio() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+        
+        function playBeep(frequency, duration, type = 'sine') {
+            if (!audioEnabled) return;
+            initAudio();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            oscillator.frequency.value = frequency;
+            oscillator.type = type;
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + duration);
+        }
+        
+        function playWarning() {
+            playBeep(880, 0.15);
+            setTimeout(() => playBeep(880, 0.15), 200);
+        }
+        
+        function playTimeUp() {
+            playBeep(523, 0.2);
+            setTimeout(() => playBeep(659, 0.2), 200);
+            setTimeout(() => playBeep(784, 0.3), 400);
+        }
+        
+        function playStart() {
+            playBeep(660, 0.1);
+            setTimeout(() => playBeep(880, 0.2), 100);
+        }
+        
+        function toggleAudio() {
+            audioEnabled = !audioEnabled;
+            document.getElementById('audioIcon').textContent = audioEnabled ? '🔔' : '🔕';
+            document.getElementById('audioStatus').textContent = audioEnabled ? 'Audio On' : 'Audio Off';
+        }
+        
+        const timers = {};
+        const intervals = {};
+        
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+        
+        function updateDisplay(timerId, remaining, total) {
+            const timeEl = document.getElementById(`${timerId}-time`);
+            const progressEl = document.getElementById(`${timerId}-progress`);
+            
+            timeEl.textContent = formatTime(remaining);
+            const percentage = ((total - remaining) / total) * 100;
+            progressEl.style.width = `${percentage}%`;
+            
+            if (remaining <= 10) {
+                timeEl.classList.remove('warning');
+                timeEl.classList.add('danger');
+                progressEl.classList.remove('warning');
+                progressEl.classList.add('danger');
+            } else if (remaining <= 30) {
+                timeEl.classList.add('warning');
+                timeEl.classList.remove('danger');
+                progressEl.classList.add('warning');
+                progressEl.classList.remove('danger');
+            } else {
+                timeEl.classList.remove('warning', 'danger');
+                progressEl.classList.remove('warning', 'danger');
+            }
+        }
+        
+        function startTimer(timerId, duration) {
+            if (intervals[timerId]) return; // already running
+            
+            // If no remaining time stored, start fresh
+            if (timers[timerId] === undefined) {
+                timers[timerId] = duration;
+            }
+
+            playStart();
+            document.getElementById(`${timerId}-status`).className = 'status-indicator active';
+            
+            intervals[timerId] = setInterval(() => {
+                timers[timerId]--;
+                updateDisplay(timerId, timers[timerId], duration);
+                
+                if (timers[timerId] === 30) playWarning();
+                else if (timers[timerId] === 10) playWarning();
+                else if (timers[timerId] <= 3 && timers[timerId] > 0) playBeep(440, 0.1);
+                
+                if (timers[timerId] <= 0) {
+                    clearInterval(intervals[timerId]);
+                    delete intervals[timerId];
+                    delete timers[timerId];
+                    playTimeUp();
+                    document.getElementById(`${timerId}-status`).className = 'status-indicator stopped';
+                }
+            }, 1000);
+        }
+        
+        function resetTimer(timerId, duration) {
+            if (intervals[timerId]) {
+                clearInterval(intervals[timerId]);
+                delete intervals[timerId];
+            }
+            timers[timerId] = duration;
+            updateDisplay(timerId, duration, duration);
+            document.getElementById(`${timerId}-status`).className = 'status-indicator stopped';
+        }
+
+        // BUG FIX: use the timer's own total duration, not a hardcoded value
+        function skipInterval(timerId, seconds) {
+            if (timers[timerId] !== undefined) {
+                const total = timerDurations[timerId];
+                timers[timerId] = Math.max(0, timers[timerId] - seconds);
+                updateDisplay(timerId, timers[timerId], total);
+            }
+        }
+        
+        function startSpeakingAll() {
+            resetTimer('speak1', 480);
+            resetTimer('speak2', 180);
+            setTimeout(() => startTimer('speak1', 480), 100);
+        }
+        
+        function startWritingAll() {
+            resetTimer('write1', 300);
+            resetTimer('write2', 420);
+            resetTimer('write3', 600);
+            setTimeout(() => startTimer('write1', 300), 100);
+        }
+        
+        function startFullPractice() {
+            startSpeakingAll();
+            setTimeout(() => {
+                resetTimer('write1', 300);
+                resetTimer('write2', 420);
+                resetTimer('write3', 600);
+                startTimer('write1', 300);
+            }, 5000);
+        }
+
+        // Initialize all displays on page load
+        Object.entries(timerDurations).forEach(([id, duration]) => {
+            updateDisplay(id, duration, duration);
+        });
+    </script>
+</body>
+</html>
